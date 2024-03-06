@@ -4,7 +4,7 @@ namespace PrimeiraApi.Rotas
 {
     public static class PessoaRotas
     {
-        public static List<Pessoa> pessoas = new List<Pessoa>() 
+        public static List<Pessoa> Pessoas = new List<Pessoa>() 
         { 
             new Pessoa(id:Guid.NewGuid(),nome:"Raul"),
             new Pessoa(id:Guid.NewGuid(),nome:"Carla"),
@@ -12,7 +12,28 @@ namespace PrimeiraApi.Rotas
         };
         public static void MapPessoasRotas(this WebApplication app)
         {
-            app.MapGet("/pessoas", () => pessoas);
+            app.MapGet("/pessoas", () => Pessoas);
+
+            app.MapGet(pattern:"/pessoas/{nome}", 
+                handler:(string nome) => Pessoas.Find(x => x.Nome == nome));
+
+            app.MapPost("pessoas",(Pessoa pessoa) =>
+            {
+                Pessoas.Add(pessoa);
+                return pessoa;
+            });
+            app.MapPut("/pessoas/{id:guid}", (Guid id, Pessoa pessoa) => 
+            { 
+                var encontrado = Pessoas.Find(x => x.Id == id); 
+                if (encontrado == null)
+                
+                    return Results.NotFound();
+                
+                encontrado.Nome = pessoa.Nome;
+                return Results.Ok(encontrado);
+
+            });
         }
+
     }
 }
